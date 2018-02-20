@@ -9,7 +9,7 @@ import com.southkart.billing.data.BillingContract.SupplierEntry;
  * Created by tantryr on 2/20/18.
  */
 
-public class BillingDbHelper extends SQLiteOpenHelper {
+public class SupplierDbHelper extends SQLiteOpenHelper {
 
     /* Name of the Database */
     private static final String DATABASE_NAME = "billTacker.db";
@@ -17,7 +17,7 @@ public class BillingDbHelper extends SQLiteOpenHelper {
     /* Version of the database */
     private static final int DATABASE_VERSION = 1;
 
-    public BillingDbHelper(Context context) {
+    public SupplierDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

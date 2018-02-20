@@ -17,6 +17,7 @@ public final class BillingContract {
 
     // Table Name Constant
     public static final String PATH_SUPPLIERS = "suppliers";
+    public static final String PATH_PRODUCTS = "products";
 
     private BillingContract(){
         // A private constructor just to ensure that no one can create a object of BillingContract Class
@@ -30,6 +31,17 @@ public final class BillingContract {
         public static final String _ID     = BaseColumns._ID;
         public static final String TABLE_NAME = "suppliers";
         public static final String SUPPLIER_NAME = "name";
+        public static final String PHONE_NUMBER = "phone_number";
+    }
+
+    public static final class ProductEntry implements BaseColumns{
+        // Content Uri Constant
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_PRODUCTS);
+
+        // Column names of the Table Supplier
+        public static final String _ID     = BaseColumns._ID;
+        public static final String TABLE_NAME = "products";
+        public static final String PRODUCT_NAME = "name";
         public static final String PHONE_NUMBER = "phone_number";
     }
 }
