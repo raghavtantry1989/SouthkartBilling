@@ -1,5 +1,6 @@
 package com.southkart.billing.data;
 
+import android.net.Uri;
 import android.provider.BaseColumns;
 
 /**
@@ -8,11 +9,22 @@ import android.provider.BaseColumns;
 
 public final class BillingContract {
 
+    // Content Authority Constant
+    public static final String CONTENT_AUTHORITY = "com.southkart.billing";
+
+    // Base Uri Constant
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://"+ CONTENT_AUTHORITY);
+
+    // Table Name Constant
+    public static final String PATH_SUPPLIERS = "suppliers";
+
     private BillingContract(){
         // A private constructor just to ensure that no one can create a object of BillingContract Class
     }
 
     public static final class SupplierEntry implements BaseColumns{
+        // Content Uri Constant
+        public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_SUPPLIERS);
 
         // Column names of the Table Supplier
         public static final String _ID     = BaseColumns._ID;
