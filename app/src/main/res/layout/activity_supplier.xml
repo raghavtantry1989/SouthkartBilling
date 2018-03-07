@@ -1,21 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".SupplierActivity">
 
     <!-- A List of Suppliers -->
     <ListView
-        android:focusable="true"
-        android:id="@+id/productList"
+        android:id="@+id/supplierList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
     <!-- FAB to go add a new supplier -->
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/productsFAB"
+        android:id="@+id/supplierFAB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -33,16 +31,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No Products Added"
+            android:text="No Supplier Added"
             android:textAppearance="?android:textAppearanceMedium"/>
 
     </RelativeLayout>
 </RelativeLayout>
 
-<!--
-<Button
-android:id="@+id/btnSupplierList"
-android:layout_width="wrap_content"
-android:layout_height="wrap_content"
-android:text="Open Supplier List"/>
- -->

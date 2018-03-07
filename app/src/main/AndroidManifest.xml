@@ -16,10 +16,36 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".SupplierActivity"
+            android:label="Suppliers"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme">
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+        <activity
+            android:name=".SupplierEditorActivity"
+            android:label="Suppliers"
+            android:parentActivityName=".SupplierActivity"
+            android:theme="@style/EditorTheme">
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".SupplierActivity" />
+        </activity>
+
+
         <provider
-            android:name=".data.SupplierProvider"
+            android:name=".data.BillingProvider"
             android:authorities="com.southkart.billing"
             android:exported="false" />
+
+        <activity android:name=".ProductEditorActivity"></activity>
     </application>
 
 </manifest>

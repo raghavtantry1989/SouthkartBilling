@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Billing</string>
+    <string name="no_suppliers_added">No Suppliers Added</string>
 </resources>
