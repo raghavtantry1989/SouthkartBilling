@@ -8,7 +8,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,23 +22,31 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.southkart.billing.data.BillingContract;
 import com.southkart.billing.data.BillingContract.ProductEntry;
+import com.southkart.billing.data.DbBitmapUtility;
 
 public class ProductEditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final static int EXISTING_PRODUCT_LOADER = 1;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
     private Uri mCurrentProductUri;
 
     private EditText mProductName;
     private EditText mProductQuantity;
     private EditText mProductPrice;
+    private ImageView mProductImage;
+
+    private Button addOne;
+    private Button subtractOne;
 
     private Button orderBtn;
-
     private boolean mProductHasChanged = false;
+    private boolean mImageHasChanged = false;
 
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
@@ -54,19 +65,33 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
         mProductName = (EditText) findViewById(R.id.productName);
         mProductQuantity = (EditText) findViewById(R.id.quantity);
         mProductPrice = (EditText) findViewById(R.id.price);
+        mProductImage = (ImageView) findViewById(R.id.productImage);
+
+        addOne = (Button) findViewById(R.id.addOne);
+        subtractOne = (Button) findViewById(R.id.subtractOne);
 
         // Set the OnTouch Listener
         mProductName.setOnTouchListener(mTouchListener);
         mProductQuantity.setOnTouchListener(mTouchListener);
         mProductPrice.setOnTouchListener(mTouchListener);
+        mProductImage.setOnTouchListener(mTouchListener);
 
         Intent intent = getIntent();
         mCurrentProductUri = intent.getData();
         if (mCurrentProductUri == null) {
             setTitle("Add a Product");
-        } else {
+
+            // Hide the Increment and Decrement Button
+            addOne.setVisibility(View.GONE);
+            subtractOne.setVisibility(View.GONE);
+        }
+        else {
             setTitle("Edit Product");
             getLoaderManager().initLoader(EXISTING_PRODUCT_LOADER, null, this);
+
+            // Show the Increment and Decrement Button
+            addOne.setVisibility(View.VISIBLE);
+            subtractOne.setVisibility(View.VISIBLE);
         }
 
         Button addQuantity = (Button) findViewById(R.id.addOne);
@@ -85,26 +110,43 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
             }
         });
 
-        Button orderButton = (Button) findViewById(R.id.order);
-        orderButton.setOnClickListener(new View.OnClickListener() {
+        // Capture Image
+        mProductImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    // Intent Setup
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    //sendIntent.putExtra(Intent.EXTRA_TEXT, message);
-                    sendIntent.setType("text/plain");
-                    if (sendIntent.resolveActivity(getPackageManager()) != null) {
-                        startActivity(sendIntent);
-                    }
-                    startActivity(sendIntent);
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                }
             }
         });
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            mProductImage.setImageBitmap(imageBitmap);
+            mImageHasChanged = true;
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_product_details,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        // If this is a new pet, hide the "Delete" menu item.
+        if (mCurrentProductUri == null) {
+            MenuItem deleteMenuItem = menu.findItem(R.id.action_delete_product);
+            MenuItem orderMenuItem = menu.findItem(R.id.action_order_product);
+            deleteMenuItem.setVisible(false);
+            orderMenuItem.setVisible(false);
+        }
         return true;
     }
 
@@ -117,6 +159,10 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
 
             case R.id.action_delete_product:
                 deleteProduct();
+                break;
+
+            case R.id.action_order_product:
+                orderProduct();
                 break;
 
             case android.R.id.home:
@@ -146,32 +192,54 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
         return super.onOptionsItemSelected(item);
     }
 
+    private void orderProduct(){
+        // Intent Setup
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        //sendIntent.putExtra(Intent.EXTRA_TEXT, message);
+        sendIntent.setType("text/plain");
+        if (sendIntent.resolveActivity(getPackageManager()) != null) {
+            startActivity(sendIntent);
+        }
+        startActivity(sendIntent);
+    }
+
     private void saveProduct(){
         String enteredProductName = mProductName.getText().toString().trim();
         String enteredQuantity = mProductQuantity.getText().toString().trim();
         String enteredPrice = mProductPrice.getText().toString().trim();
 
-        if(mCurrentProductUri == null && TextUtils.isEmpty(enteredProductName) &&
-                TextUtils.isEmpty(enteredQuantity) && TextUtils.isEmpty(enteredQuantity)){
-            Toast.makeText(this, "Please Enter Product Information",
+        if(mCurrentProductUri == null
+                && TextUtils.isEmpty(enteredProductName)
+                && TextUtils.isEmpty(enteredQuantity)
+                && TextUtils.isEmpty(enteredQuantity)
+                && TextUtils.isEmpty(enteredPrice)
+                && !mImageHasChanged){
+            Toast.makeText(this, R.string.enter_product_details,
                     Toast.LENGTH_LONG).show();
             return;
         }
 
         if(TextUtils.isEmpty(enteredProductName)){
-            Toast.makeText(this, "Please Enter Product Name",
+            Toast.makeText(this, R.string.enter_product_name,
                     Toast.LENGTH_SHORT).show();
             return;
         }
 
         if(TextUtils.isEmpty(enteredQuantity)){
-            Toast.makeText(this, "Please Enter Quantity",
+            Toast.makeText(this, R.string.enter_product_quantity,
                     Toast.LENGTH_SHORT).show();
             return;
         }
 
         if(TextUtils.isEmpty(enteredPrice)){
-            Toast.makeText(this, "Please Enter Price",
+            Toast.makeText(this, R.string.enter_product_price,
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(!mImageHasChanged){
+            Toast.makeText(this, R.string.add_product_photo,
                     Toast.LENGTH_SHORT).show();
             return;
         }
@@ -180,6 +248,8 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
         values.put(ProductEntry.PRODUCT_NAME,enteredProductName);
         values.put(ProductEntry.PRODUCT_QUANTITY,Integer.parseInt(enteredQuantity));
         values.put(ProductEntry.PRODUCT_PRICE,Integer.parseInt(enteredPrice));
+        values.put(ProductEntry.PRODUCT_IMAGE, DbBitmapUtility.getBytes(mProductImage));
+
 
         if(mCurrentProductUri == null){
             // Insert Product Data
@@ -187,12 +257,12 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
 
             if(newUri == null){
                 // If the new content URI is null, then there was an error with insertion.
-                Toast.makeText(this, "Error while saving Product",
+                Toast.makeText(this, R.string.error_while_saving,
                         Toast.LENGTH_SHORT).show();
             }
             else{
                 // Otherwise, the insertion was successful and we can display a toast.
-                Toast.makeText(this, "Product Saved",
+                Toast.makeText(this, R.string.product_saved,
                         Toast.LENGTH_SHORT).show();
             }
         } else {
@@ -201,11 +271,11 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
 
             if(rowsAffected == 0 ){
                 // If no rows were affected, then there was an error with the update.
-                Toast.makeText(this, "Update Failed",
+                Toast.makeText(this, R.string.update_failed,
                         Toast.LENGTH_SHORT).show();
             }else {
                 // Otherwise, the update was successful and we can display a toast.
-                Toast.makeText(this, "Update Successful",
+                Toast.makeText(this, R.string.update_successful,
                         Toast.LENGTH_SHORT).show();
             }
         }
@@ -246,22 +316,23 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
         // Find the Existing Value of the Quantity Present
         String enteredQuantity = mProductQuantity.getText().toString().trim();
         int enteredQuantityInInt = Integer.parseInt(enteredQuantity);
+        int modifiedQuantity = enteredQuantityInInt + modifyQuantityByNumber;
 
-        if (enteredQuantityInInt > 0 ){
+        if (modifiedQuantity >= 0 ){
             // Form the values Object
             ContentValues values = new ContentValues();
-            values.put(ProductEntry.PRODUCT_QUANTITY,enteredQuantityInInt+ modifyQuantityByNumber);
+            values.put(ProductEntry.PRODUCT_QUANTITY,modifiedQuantity);
 
             // Update the data
             int rowsAffected = getContentResolver().update(mCurrentProductUri,values,null,null);
 
             if(rowsAffected == 0 ){
                 // If no rows were affected, then there was an error with the update.
-                Toast.makeText(this, "Update Failed",
+                Toast.makeText(this, R.string.update_failed,
                         Toast.LENGTH_SHORT).show();
             }else {
                 // Otherwise, the update was successful and we can display a toast.
-                Toast.makeText(this, "Update Successful",
+                Toast.makeText(this, R.string.update_successful,
                         Toast.LENGTH_SHORT).show();
             }
         }
@@ -276,7 +347,8 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
                 ProductEntry._ID,
                 ProductEntry.PRODUCT_NAME,
                 ProductEntry.PRODUCT_QUANTITY,
-                ProductEntry.PRODUCT_PRICE
+                ProductEntry.PRODUCT_PRICE,
+                ProductEntry.PRODUCT_IMAGE
         };
 
         return new CursorLoader(this,
@@ -295,16 +367,22 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
             int nameColumnIndex = cursor.getColumnIndex(ProductEntry.PRODUCT_NAME);
             int quantityColumnIndex = cursor.getColumnIndex(ProductEntry.PRODUCT_QUANTITY);
             int priceColumnIndex = cursor.getColumnIndex(ProductEntry.PRODUCT_PRICE);
+            int imageColumnIndex = cursor.getColumnIndex(ProductEntry.PRODUCT_IMAGE);
 
             // Extract out the value from the Cursor for the given column index
             String productName = cursor.getString(nameColumnIndex);
             String quantity = cursor.getString(quantityColumnIndex);
             String price = cursor.getString(priceColumnIndex);
+            byte[] imageInBytes = cursor.getBlob(imageColumnIndex);
 
             // Set the values in appropriate UI Elements
             mProductName.setText(productName);
             mProductQuantity.setText(quantity);
             mProductPrice.setText(price);
+            if(imageInBytes != null){
+                mProductImage.setImageBitmap(DbBitmapUtility.getImage(imageInBytes));
+            }
+
         }
     }
 
@@ -319,9 +397,9 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
         //Create an AlertDialog.Builder and set the message, and click listeners
         // for the positive and negative buttons on the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Discard Changes and Quit Editing?");
-        builder.setPositiveButton("Discard",discardButtonClickListener);
-        builder.setNegativeButton("Keep Editing", new DialogInterface.OnClickListener() {
+        builder.setMessage(R.string.discard_and_quit);
+        builder.setPositiveButton(R.string.discard,discardButtonClickListener);
+        builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // User clicked the "Keep editing" button, so dismiss the dialog

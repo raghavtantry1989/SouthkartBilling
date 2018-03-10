@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,11 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.southkart.billing.data.BillingContract;
 import com.southkart.billing.data.BillingContract.ProductEntry;
 
 /**
@@ -43,7 +46,6 @@ public class ProductCursorAdapter extends CursorAdapter {
         Button saleBtn = (Button) view.findViewById(R.id.saleBtn);
 
         // Get Column Index
-
         int idColumnIndex = cursor.getColumnIndex(ProductEntry._ID);
         int nameColumnIndex = cursor.getColumnIndex(ProductEntry.PRODUCT_NAME);
         int quantityColumnIndex = cursor.getColumnIndex(ProductEntry.PRODUCT_QUANTITY);

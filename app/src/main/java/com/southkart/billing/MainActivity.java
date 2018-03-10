@@ -93,6 +93,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 // Delete All
                 deleteAllProducts();
                 return true;
+
+            case R.id.action_add_suppliers:
+                addSupplierDetails();
+                return true;
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -109,6 +114,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private void deleteAllProducts(){
         showAlert();
+    }
+
+    private void addSupplierDetails(){
+        Intent intent = new Intent(MainActivity.this,SupplierActivity.class);
+        startActivity(intent);
     }
 
     private void showAlert(){
@@ -187,11 +197,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             if(rowsAffected == 0 ){
                 // If no rows were affected, then there was an error with the update.
-                Toast.makeText(this, "Update Failed",
+                Toast.makeText(this, R.string.update_failed,
                         Toast.LENGTH_SHORT).show();
             }else {
                 // Otherwise, the update was successful and we can display a toast.
-                Toast.makeText(this, "Update Successful",
+                Toast.makeText(this, R.string.update_successful,
                         Toast.LENGTH_SHORT).show();
             }
         }else {

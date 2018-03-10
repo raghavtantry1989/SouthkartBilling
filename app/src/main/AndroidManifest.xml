@@ -39,13 +39,21 @@
                 android:value=".SupplierActivity" />
         </activity>
 
-
         <provider
             android:name=".data.BillingProvider"
             android:authorities="com.southkart.billing"
             android:exported="false" />
 
-        <activity android:name=".ProductEditorActivity"></activity>
+        <activity android:name=".ProductEditorActivity"
+            android:label="Product Details"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/EditorTheme">
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
     </application>
 
 </manifest>

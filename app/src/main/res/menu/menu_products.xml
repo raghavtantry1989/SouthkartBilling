@@ -6,6 +6,10 @@
         android:title="Insert Dummy Product"
         app:showAsAction="never" />
 
+    <item android:id="@+id/action_add_suppliers"
+        android:title="Add Suppliers"
+        app:showAsAction="never" />
+
     <item android:id="@+id/action_delete_all_product"
         android:title="Delete all Product"
         app:showAsAction="never" />

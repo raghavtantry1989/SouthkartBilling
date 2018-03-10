@@ -31,7 +31,6 @@ public class BillingProvider extends ContentProvider {
     // Single Supplier Data
     private static final int PRODUCT_ID = 201;
 
-
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
@@ -158,6 +157,17 @@ public class BillingProvider extends ContentProvider {
         // Get reference to writable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
+        // Data Validation at Database Side
+        String supplierName = values.getAsString(SupplierEntry.SUPPLIER_NAME);
+        if(supplierName == null){
+            throw new IllegalArgumentException("Supplier Name Required");
+        }
+
+        String supplierPhoneNumber = values.getAsString(SupplierEntry.PHONE_NUMBER);
+        if(supplierPhoneNumber == null){
+            throw new IllegalArgumentException("Supplier Phone Required");
+        }
+
         // Insert the data
         long id = database.insert(SupplierEntry.TABLE_NAME,null,values);
 
@@ -175,6 +185,23 @@ public class BillingProvider extends ContentProvider {
         // Get reference to writable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
+        // Data Validation at Database Side
+        String productName = values.getAsString(ProductEntry.PRODUCT_NAME);
+        if(productName == null){
+            throw new IllegalArgumentException("Product Name Required");
+        }
+
+        Integer quantity = values.getAsInteger(ProductEntry.PRODUCT_QUANTITY);
+        Integer price = values.getAsInteger(ProductEntry.PRODUCT_PRICE);
+
+        if(quantity == null || quantity<0){
+            throw new IllegalArgumentException("Quantity Required and should be greateer than 0");
+        }
+
+        if(price == null || price<0){
+            throw new IllegalArgumentException("Price Required and should be greateer than 0");
+        }
+
         // Insert the data
         long id = database.insert(ProductEntry.TABLE_NAME,null,values);
 
@@ -184,7 +211,6 @@ public class BillingProvider extends ContentProvider {
         }
 
         getContext().getContentResolver().notifyChange(uri,null);
-
         return ContentUris.withAppendedId(uri,id);
     }
 

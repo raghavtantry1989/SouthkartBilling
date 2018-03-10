@@ -1,4 +1,16 @@
 <resources>
     <string name="app_name">Billing</string>
     <string name="no_suppliers_added">No Suppliers Added</string>
+    <string name="update_failed">Update Failed</string>
+    <string name="update_successful">Update Successful</string>
+    <string name="enter_product_details">Please Enter Product Name, Quantity, Price and Photo</string>
+    <string name="enter_product_name">Please Enter Product Name</string>
+    <string name="enter_product_quantity">Please Enter Quantity</string>
+    <string name="enter_product_price">Please Enter Price</string>
+    <string name="add_product_photo">Please Add a Product Image</string>
+    <string name="error_while_saving">Error while saving Product</string>
+    <string name="product_saved">Product Saved</string>
+    <string name="keep_editing">Keep Editing</string>
+    <string name="discard">Discard</string>
+    <string name="discard_and_quit">Discard Changes and Quit Editing?</string>
 </resources>

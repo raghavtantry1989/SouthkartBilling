@@ -30,6 +30,13 @@ public class BillingDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // on upgrade drop older tables
+        db.execSQL("DROP TABLE IF EXISTS " + ProductEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + SupplierEntry.TABLE_NAME);
+
+        // create new table
+        addSupplierTable(db);
+        addProductTable(db);
 
     }
 
@@ -46,14 +53,15 @@ public class BillingDbHelper extends SQLiteOpenHelper {
     }
 
     private void addProductTable(SQLiteDatabase db){
-        // CREATE TABLE products (id INTEGER, name TEXT, quantity INTEGER, price INTEGER);
+        // CREATE TABLE products (id INTEGER, name TEXT, quantity INTEGER, price INTEGER, image BLOB );
 
         String CREATE_TABLE_PRODUCTS = "CREATE TABLE " + ProductEntry.TABLE_NAME + " ("
                 + ProductEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + ProductEntry.PRODUCT_NAME + " TEXT,"
                 + ProductEntry.PRODUCT_QUANTITY + " INTEGER,"
-                + ProductEntry.PRODUCT_PRICE + " INTEGER"
-                + ");";
+                + ProductEntry.PRODUCT_PRICE + " INTEGER,"
+                + ProductEntry.PRODUCT_IMAGE + " BLOB"
+                + " );";
 
         db.execSQL(CREATE_TABLE_PRODUCTS);
     }
