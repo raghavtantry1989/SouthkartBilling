@@ -8,8 +8,8 @@
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_weight="2"
         android:layout_height="wrap_content"
+        android:layout_weight="2"
         android:orientation="vertical">
 
         <TextView
@@ -18,18 +18,20 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
             android:textAppearance="?android:textAppearanceMedium"
-            android:textColor="#2B3D4D"/>
+            android:textColor="#2B3D4D" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif"
                 android:text="Quantity:"
                 android:textAppearance="?android:textAppearanceSmall"
-                android:textColor="#AEB6BD"/>
+                android:textColor="#AEB6BD" />
+
             <TextView
                 android:id="@+id/quantity"
                 android:layout_width="wrap_content"
@@ -37,27 +39,27 @@
                 android:layout_marginLeft="4dp"
                 android:fontFamily="sans-serif"
                 android:textAppearance="?android:textAppearanceSmall"
-                android:textColor="#2B3D4D"/>
+                android:textColor="#2B3D4D" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
                 android:fontFamily="sans-serif"
                 android:text="Price: "
-                android:layout_marginLeft="24dp"
                 android:textAppearance="?android:textAppearanceSmall"
-                android:textColor="#AEB6BD"/>
+                android:textColor="#AEB6BD" />
+
             <TextView
                 android:id="@+id/price"
                 android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_marginLeft="4dp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_weight="1"
                 android:fontFamily="sans-serif"
                 android:textAppearance="?android:textAppearanceSmall"
-                android:textColor="#2B3D4D"/>
+                android:textColor="#2B3D4D" />
         </LinearLayout>
-
     </LinearLayout>
 
     <LinearLayout
@@ -66,13 +68,10 @@
 
         <Button
             android:id="@+id/saleBtn"
-            android:onClick="saleButtonHandler"
-            android:focusable="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="SALE"/>
+            android:focusable="false"
+            android:onClick="saleButtonHandler"
+            android:text="SALE" />
     </LinearLayout>
-
-
-
 </LinearLayout>

@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.app.NavUtils;
@@ -22,12 +21,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.southkart.billing.data.BillingContract;
-import com.southkart.billing.data.BillingContract.ProductEntry;
+import com.southkart.billing.data.InventoryContract.ProductEntry;
 import com.southkart.billing.data.DbBitmapUtility;
 
 public class ProductEditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -67,8 +64,8 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
         mProductPrice = (EditText) findViewById(R.id.price);
         mProductImage = (ImageView) findViewById(R.id.productImage);
 
-        addOne = (Button) findViewById(R.id.addOne);
-        subtractOne = (Button) findViewById(R.id.subtractOne);
+        addOne = (Button) findViewById(R.id.button_add_one);
+        subtractOne = (Button) findViewById(R.id.button_subtract_one);
 
         // Set the OnTouch Listener
         mProductName.setOnTouchListener(mTouchListener);
@@ -84,8 +81,7 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
             // Hide the Increment and Decrement Button
             addOne.setVisibility(View.GONE);
             subtractOne.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             setTitle("Edit Product");
             getLoaderManager().initLoader(EXISTING_PRODUCT_LOADER, null, this);
 
@@ -94,19 +90,32 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
             subtractOne.setVisibility(View.VISIBLE);
         }
 
-        Button addQuantity = (Button) findViewById(R.id.addOne);
-        addQuantity.setOnClickListener(new View.OnClickListener() {
+        addOne.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 modifyQuantity(1);
             }
         });
-
-        Button subtractQuantity = (Button) findViewById(R.id.subtractOne);
-        subtractQuantity.setOnClickListener(new View.OnClickListener() {
+        subtractOne.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 modifyQuantity(-1);
+            }
+        });
+
+        Button orderBtn = (Button) findViewById(R.id.order);
+        orderBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Intent Setup
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                //sendIntent.putExtra(Intent.EXTRA_TEXT, message);
+                sendIntent.setType("text/plain");
+                if (sendIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(sendIntent);
+                }
+                startActivity(sendIntent);
             }
         });
 
@@ -133,26 +142,24 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_product_details,menu);
+        getMenuInflater().inflate(R.menu.menu_product_details, menu);
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        // If this is a new pet, hide the "Delete" menu item.
+        // If this is a new Product, hide the "Delete" menu item.
         if (mCurrentProductUri == null) {
             MenuItem deleteMenuItem = menu.findItem(R.id.action_delete_product);
-            MenuItem orderMenuItem = menu.findItem(R.id.action_order_product);
             deleteMenuItem.setVisible(false);
-            orderMenuItem.setVisible(false);
         }
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_save_product:
                 saveProduct();
                 break;
@@ -161,12 +168,8 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
                 deleteProduct();
                 break;
 
-            case R.id.action_order_product:
-                orderProduct();
-                break;
-
             case android.R.id.home:
-                // If the pet hasn't changed, continue with navigating up to parent activity
+                // If the Product hasn't changed, continue with navigating up to parent activity
                 // which is the {@link CatalogActivity}.
                 if (!mProductHasChanged) {
                     NavUtils.navigateUpFromSameTask(ProductEditorActivity.this);
@@ -192,88 +195,83 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
         return super.onOptionsItemSelected(item);
     }
 
-    private void orderProduct(){
-        // Intent Setup
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        //sendIntent.putExtra(Intent.EXTRA_TEXT, message);
-        sendIntent.setType("text/plain");
-        if (sendIntent.resolveActivity(getPackageManager()) != null) {
-            startActivity(sendIntent);
-        }
-        startActivity(sendIntent);
-    }
-
-    private void saveProduct(){
+    private void saveProduct() {
         String enteredProductName = mProductName.getText().toString().trim();
         String enteredQuantity = mProductQuantity.getText().toString().trim();
         String enteredPrice = mProductPrice.getText().toString().trim();
 
-        if(mCurrentProductUri == null
+        if (mCurrentProductUri == null
                 && TextUtils.isEmpty(enteredProductName)
                 && TextUtils.isEmpty(enteredQuantity)
                 && TextUtils.isEmpty(enteredQuantity)
                 && TextUtils.isEmpty(enteredPrice)
-                && !mImageHasChanged){
+                && !mImageHasChanged) {
             Toast.makeText(this, R.string.enter_product_details,
                     Toast.LENGTH_LONG).show();
             return;
         }
 
-        if(TextUtils.isEmpty(enteredProductName)){
+        if (TextUtils.isEmpty(enteredProductName)) {
             Toast.makeText(this, R.string.enter_product_name,
                     Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if(TextUtils.isEmpty(enteredQuantity)){
+        if (TextUtils.isEmpty(enteredQuantity)) {
             Toast.makeText(this, R.string.enter_product_quantity,
                     Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if(TextUtils.isEmpty(enteredPrice)){
+        if (TextUtils.isEmpty(enteredPrice)) {
             Toast.makeText(this, R.string.enter_product_price,
                     Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if(!mImageHasChanged){
-            Toast.makeText(this, R.string.add_product_photo,
-                    Toast.LENGTH_SHORT).show();
-            return;
+
+        if (mCurrentProductUri == null) {
+            // Insert new product
+            if (!mImageHasChanged) {
+                Toast.makeText(this, R.string.add_product_photo,
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+        } else {
+            // Update new Product
+            // Do Nothing
         }
 
+
         ContentValues values = new ContentValues();
-        values.put(ProductEntry.PRODUCT_NAME,enteredProductName);
-        values.put(ProductEntry.PRODUCT_QUANTITY,Integer.parseInt(enteredQuantity));
-        values.put(ProductEntry.PRODUCT_PRICE,Integer.parseInt(enteredPrice));
+        values.put(ProductEntry.PRODUCT_NAME, enteredProductName);
+        values.put(ProductEntry.PRODUCT_QUANTITY, Float.parseFloat(enteredQuantity));
+        values.put(ProductEntry.PRODUCT_PRICE, Float.parseFloat(enteredPrice));
         values.put(ProductEntry.PRODUCT_IMAGE, DbBitmapUtility.getBytes(mProductImage));
 
 
-        if(mCurrentProductUri == null){
+        if (mCurrentProductUri == null) {
             // Insert Product Data
-            Uri newUri = getContentResolver().insert(ProductEntry.CONTENT_URI,values);
+            Uri newUri = getContentResolver().insert(ProductEntry.CONTENT_URI, values);
 
-            if(newUri == null){
+            if (newUri == null) {
                 // If the new content URI is null, then there was an error with insertion.
                 Toast.makeText(this, R.string.error_while_saving,
                         Toast.LENGTH_SHORT).show();
-            }
-            else{
+            } else {
                 // Otherwise, the insertion was successful and we can display a toast.
                 Toast.makeText(this, R.string.product_saved,
                         Toast.LENGTH_SHORT).show();
             }
         } else {
             // Update the data
-            int rowsAffected = getContentResolver().update(mCurrentProductUri,values,null,null);
+            int rowsAffected = getContentResolver().update(mCurrentProductUri, values, null, null);
 
-            if(rowsAffected == 0 ){
+            if (rowsAffected == 0) {
                 // If no rows were affected, then there was an error with the update.
                 Toast.makeText(this, R.string.update_failed,
                         Toast.LENGTH_SHORT).show();
-            }else {
+            } else {
                 // Otherwise, the update was successful and we can display a toast.
                 Toast.makeText(this, R.string.update_successful,
                         Toast.LENGTH_SHORT).show();
@@ -282,11 +280,11 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
         finish();
     }
 
-    private void deleteProduct(){
+    private void deleteProduct() {
         showAlert();
     }
 
-    private void showAlert(){
+    private void showAlert() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Do you want to delete this product?");
         builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
@@ -301,7 +299,7 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(dialog!=null){
+                if (dialog != null) {
                     dialog.dismiss();
                 }
             }
@@ -312,31 +310,30 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
         alertDialog.show();
     }
 
-    private void modifyQuantity(int modifyQuantityByNumber){
+    private void modifyQuantity(int modifyQuantityByNumber) {
         // Find the Existing Value of the Quantity Present
         String enteredQuantity = mProductQuantity.getText().toString().trim();
         int enteredQuantityInInt = Integer.parseInt(enteredQuantity);
         int modifiedQuantity = enteredQuantityInInt + modifyQuantityByNumber;
 
-        if (modifiedQuantity >= 0 ){
+        if (modifiedQuantity >= 0) {
             // Form the values Object
             ContentValues values = new ContentValues();
-            values.put(ProductEntry.PRODUCT_QUANTITY,modifiedQuantity);
+            values.put(ProductEntry.PRODUCT_QUANTITY, modifiedQuantity);
 
             // Update the data
-            int rowsAffected = getContentResolver().update(mCurrentProductUri,values,null,null);
+            int rowsAffected = getContentResolver().update(mCurrentProductUri, values, null, null);
 
-            if(rowsAffected == 0 ){
+            if (rowsAffected == 0) {
                 // If no rows were affected, then there was an error with the update.
                 Toast.makeText(this, R.string.update_failed,
                         Toast.LENGTH_SHORT).show();
-            }else {
+            } else {
                 // Otherwise, the update was successful and we can display a toast.
                 Toast.makeText(this, R.string.update_successful,
                         Toast.LENGTH_SHORT).show();
             }
-        }
-        else {
+        } else {
             return;
         }
     }
@@ -363,7 +360,7 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (cursor.moveToFirst()) {
 
-            // Find the columns of pet attributes that we're interested in
+            // Find the columns of product attributes that we're interested in
             int nameColumnIndex = cursor.getColumnIndex(ProductEntry.PRODUCT_NAME);
             int quantityColumnIndex = cursor.getColumnIndex(ProductEntry.PRODUCT_QUANTITY);
             int priceColumnIndex = cursor.getColumnIndex(ProductEntry.PRODUCT_PRICE);
@@ -379,7 +376,7 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
             mProductName.setText(productName);
             mProductQuantity.setText(quantity);
             mProductPrice.setText(price);
-            if(imageInBytes != null){
+            if (imageInBytes != null) {
                 mProductImage.setImageBitmap(DbBitmapUtility.getImage(imageInBytes));
             }
 
@@ -393,18 +390,18 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
         mProductPrice.setText("");
     }
 
-    private void showUnsavedChangesDialog(DialogInterface.OnClickListener discardButtonClickListener){
+    private void showUnsavedChangesDialog(DialogInterface.OnClickListener discardButtonClickListener) {
         //Create an AlertDialog.Builder and set the message, and click listeners
         // for the positive and negative buttons on the dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.discard_and_quit);
-        builder.setPositiveButton(R.string.discard,discardButtonClickListener);
+        builder.setPositiveButton(R.string.discard, discardButtonClickListener);
         builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // User clicked the "Keep editing" button, so dismiss the dialog
-                // and continue editing the pet.
-                if(dialog != null){
+                // and continue editing the product.
+                if (dialog != null) {
                     dialog.dismiss();
                 }
             }

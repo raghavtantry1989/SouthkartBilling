@@ -1,25 +1,16 @@
 package com.southkart.billing;
 
-import android.app.Activity;
-import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CursorAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.southkart.billing.data.BillingContract.ProductEntry;
+import com.southkart.billing.data.InventoryContract.ProductEntry;
 
 /**
  * Created by tantryr on 3/1/18.
@@ -58,8 +49,8 @@ public class ProductCursorAdapter extends CursorAdapter {
         String priceValue = cursor.getString(priceColumnIndex);
 
         // Set Tags
-        saleBtn.setTag(R.id.position,idValue);
-        saleBtn.setTag(R.id.quantity,quantityValue);
+        saleBtn.setTag(R.id.position, idValue);
+        saleBtn.setTag(R.id.quantity, quantityValue);
 
         Log.v("PRODUCT NAME", nameValue);
         Log.v("QUANTITY", quantityValue);

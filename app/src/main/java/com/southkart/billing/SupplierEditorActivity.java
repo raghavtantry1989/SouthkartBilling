@@ -15,13 +15,12 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.southkart.billing.data.BillingContract;
-import com.southkart.billing.data.BillingContract.SupplierEntry;
+import com.southkart.billing.data.InventoryContract.SupplierEntry;
 
 public class SupplierEditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final int EXISTING_PET_LOADER = 0;
-    private Uri mCurrentPetUri;
+    private static final int EXISTING_SUPPLIER_LOADER = 0;
+    private Uri mCurrentSupplierUri;
 
     // Reference of UI Elements
     private EditText mSupplierName;
@@ -38,24 +37,24 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
 
 
         Intent intent = getIntent();
-        mCurrentPetUri = intent.getData();
-        if (mCurrentPetUri == null) {
+        mCurrentSupplierUri = intent.getData();
+        if (mCurrentSupplierUri == null) {
             setTitle("Add a Supplier");
         } else {
             setTitle("Edit Supplier");
-            getLoaderManager().initLoader(EXISTING_PET_LOADER, null, this);
+            getLoaderManager().initLoader(EXISTING_SUPPLIER_LOADER, null, this);
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_supplier_details,menu);
+        getMenuInflater().inflate(R.menu.menu_supplier_details, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_save_supplier:
                 saveSupplier();
                 finish();
@@ -68,42 +67,41 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
         return super.onOptionsItemSelected(item);
     }
 
-    private void saveSupplier(){
+    private void saveSupplier() {
         String enteredSupplierName = mSupplierName.getText().toString().trim();
         String enteredPhoneNumber = mSupplierPhone.getText().toString().trim();
 
         ContentValues values = new ContentValues();
-        values.put(SupplierEntry.SUPPLIER_NAME,enteredSupplierName);
-        values.put(SupplierEntry.PHONE_NUMBER,enteredPhoneNumber);
+        values.put(SupplierEntry.SUPPLIER_NAME, enteredSupplierName);
+        values.put(SupplierEntry.PHONE_NUMBER, enteredPhoneNumber);
 
-        if(mCurrentPetUri == null && TextUtils.isEmpty(enteredSupplierName) &&
-                TextUtils.isEmpty(enteredPhoneNumber)){
+        if (mCurrentSupplierUri == null && TextUtils.isEmpty(enteredSupplierName) &&
+                TextUtils.isEmpty(enteredPhoneNumber)) {
             return;
         }
 
-        if(mCurrentPetUri == null){
+        if (mCurrentSupplierUri == null) {
             // Insert Supplier Data
-            Uri newUri = getContentResolver().insert(SupplierEntry.CONTENT_URI,values);
+            Uri newUri = getContentResolver().insert(SupplierEntry.CONTENT_URI, values);
 
-            if(newUri == null){
+            if (newUri == null) {
                 // If the new content URI is null, then there was an error with insertion.
                 Toast.makeText(this, "Error while saving Supplier",
                         Toast.LENGTH_SHORT).show();
-            }
-            else{
+            } else {
                 // Otherwise, the insertion was successful and we can display a toast.
                 Toast.makeText(this, "Supplier Saved",
                         Toast.LENGTH_SHORT).show();
             }
         } else {
             // Update the data
-            int rowsAffected = getContentResolver().update(mCurrentPetUri,values,null,null);
+            int rowsAffected = getContentResolver().update(mCurrentSupplierUri, values, null, null);
 
-            if(rowsAffected == 0 ){
+            if (rowsAffected == 0) {
                 // If no rows were affected, then there was an error with the update.
                 Toast.makeText(this, "Update Failed",
                         Toast.LENGTH_SHORT).show();
-            }else {
+            } else {
                 // Otherwise, the update was successful and we can display a toast.
                 Toast.makeText(this, "Update Successful",
                         Toast.LENGTH_SHORT).show();
@@ -111,7 +109,7 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
         }
     }
 
-    private void deleteAll(){
+    private void deleteAll() {
 
     }
 
@@ -124,7 +122,7 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
         };
 
         return new CursorLoader(this,
-                mCurrentPetUri,
+                mCurrentSupplierUri,
                 projection,
                 null,
                 null,
@@ -135,7 +133,7 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
     public void onLoadFinished(Loader loader, Cursor cursor) {
         if (cursor.moveToFirst()) {
 
-            // Find the columns of pet attributes that we're interested in
+            // Find the columns of Supplier attributes that we're interested in
             int nameColumnIndex = cursor.getColumnIndex(SupplierEntry.SUPPLIER_NAME);
             int phoneColumnIndex = cursor.getColumnIndex(SupplierEntry.PHONE_NUMBER);
 

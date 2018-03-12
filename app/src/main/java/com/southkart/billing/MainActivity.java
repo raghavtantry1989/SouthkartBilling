@@ -8,8 +8,13 @@ import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,12 +22,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.southkart.billing.data.BillingContract;
-import com.southkart.billing.data.BillingContract.ProductEntry;
+import com.southkart.billing.data.DbBitmapUtility;
+import com.southkart.billing.data.InventoryContract.ProductEntry;
+
+import java.io.ByteArrayOutputStream;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -41,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this,ProductEditorActivity.class);
+                Intent intent = new Intent(MainActivity.this, ProductEditorActivity.class);
                 startActivity(intent);
             }
         });
@@ -50,13 +56,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         list = (ListView) findViewById(R.id.productList);
 
         // Create object of Custom Cursor Adapter
-        mCursorAdapter = new ProductCursorAdapter(this,null);
+        mCursorAdapter = new ProductCursorAdapter(this, null);
 
         // Hook up the Adapter and the List View
         list.setAdapter(mCursorAdapter);
 
         // Kick Off the Loader
-        getLoaderManager().initLoader(PRODUCT_LOADER,null,this);
+        getLoaderManager().initLoader(PRODUCT_LOADER, null, this);
 
         // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
         View emptyView = findViewById(R.id.empty_view);
@@ -66,17 +72,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(MainActivity.this,ProductEditorActivity.class);
-                Uri currentPetUri = ContentUris.withAppendedId(ProductEntry.CONTENT_URI,id);
-                intent.setData(currentPetUri);
+                Intent intent = new Intent(MainActivity.this, ProductEditorActivity.class);
+                Uri currentProductUri = ContentUris.withAppendedId(ProductEntry.CONTENT_URI, id);
+                intent.setData(currentProductUri);
                 startActivity(intent);
             }
         });
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if(!prefs.getBoolean("firstTime", false)) {
+            insertDummy();
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("firstTime", true);
+            editor.commit();
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_products,menu);
+        getMenuInflater().inflate(R.menu.menu_products, menu);
         return true;
     }
 
@@ -84,10 +98,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
-            // Respond to a click on the "Insert dummy data" menu option
-            case R.id.action_insert_dummy_product:
-                insertDummy();
-                return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_product:
                 // Delete All
@@ -103,25 +113,32 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     // Insert Dummy Function
-    private void insertDummy(){
-        ContentValues values = new ContentValues();
-        values.put(ProductEntry.PRODUCT_NAME,"Puttu Podi");
-        values.put(ProductEntry.PRODUCT_QUANTITY,5);
-        values.put(ProductEntry.PRODUCT_PRICE,49);
+    private void insertDummy() {
+        Bitmap placeholder = BitmapFactory.decodeResource(getResources(),
+                R.drawable.banana);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        placeholder.compress(Bitmap.CompressFormat.JPEG, 0, stream);
+        byte[] img = stream.toByteArray();
 
-        Uri newUri = getContentResolver().insert(ProductEntry.CONTENT_URI,values);
+        ContentValues values = new ContentValues();
+        values.put(ProductEntry.PRODUCT_NAME, "Banana");
+        values.put(ProductEntry.PRODUCT_QUANTITY, 5);
+        values.put(ProductEntry.PRODUCT_PRICE, 10);
+        values.put(ProductEntry.PRODUCT_IMAGE, img);
+
+        Uri newUri = getContentResolver().insert(ProductEntry.CONTENT_URI, values);
     }
 
-    private void deleteAllProducts(){
+    private void deleteAllProducts() {
         showAlert();
     }
 
-    private void addSupplierDetails(){
-        Intent intent = new Intent(MainActivity.this,SupplierActivity.class);
+    private void addSupplierDetails() {
+        Intent intent = new Intent(MainActivity.this, SupplierActivity.class);
         startActivity(intent);
     }
 
-    private void showAlert(){
+    private void showAlert() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Do you want to delete this product?");
         builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
@@ -135,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(dialog!=null){
+                if (dialog != null) {
                     dialog.dismiss();
                 }
             }
@@ -176,38 +193,37 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mCursorAdapter.swapCursor(null);
     }
 
-    public void saleButtonHandler(View view){
+    public void saleButtonHandler(View view) {
         // Read from Tags
         int id = Integer.parseInt(view.getTag(R.id.position).toString());
         int quantity = Integer.parseInt(view.getTag(R.id.quantity).toString());
 
-        if(quantity > 0){
+        if (quantity > 0) {
             // Decrement the quantity value by 1 as SALE button was pressed
             quantity = quantity - 1;
 
             // Form the values Object
             ContentValues values = new ContentValues();
-            values.put(ProductEntry.PRODUCT_QUANTITY,quantity);
+            values.put(ProductEntry.PRODUCT_QUANTITY, quantity);
 
             // Form the URI
-            Uri currentProductUri = ContentUris.withAppendedId(ProductEntry.CONTENT_URI,id);
+            Uri currentProductUri = ContentUris.withAppendedId(ProductEntry.CONTENT_URI, id);
 
             // Update the data
-            int rowsAffected = getContentResolver().update(currentProductUri,values,null,null);
+            int rowsAffected = getContentResolver().update(currentProductUri, values, null, null);
 
-            if(rowsAffected == 0 ){
+            if (rowsAffected == 0) {
                 // If no rows were affected, then there was an error with the update.
                 Toast.makeText(this, R.string.update_failed,
                         Toast.LENGTH_SHORT).show();
-            }else {
+            } else {
                 // Otherwise, the update was successful and we can display a toast.
                 Toast.makeText(this, R.string.update_successful,
                         Toast.LENGTH_SHORT).show();
             }
-        }else {
+        } else {
             // Do Nothing
             return;
         }
-
     }
 }

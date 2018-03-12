@@ -9,8 +9,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
-import com.southkart.billing.data.BillingContract;
-import com.southkart.billing.data.BillingContract.SupplierEntry;
+import com.southkart.billing.data.InventoryContract.SupplierEntry;
 
 /**
  * Created by tantryr on 2/23/18.
@@ -24,14 +23,14 @@ public class SupplierCursorAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.item_supplier,parent,false);
+        return LayoutInflater.from(context).inflate(R.layout.item_supplier, parent, false);
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         // Reference
         TextView name = (TextView) view.findViewById(R.id.supplierName);
-        TextView phone  = (TextView) view.findViewById(R.id.supplierPhone);
+        TextView phone = (TextView) view.findViewById(R.id.supplierPhone);
 
         // Get Column Index
         int nameColumnIndex = cursor.getColumnIndex(SupplierEntry.SUPPLIER_NAME);

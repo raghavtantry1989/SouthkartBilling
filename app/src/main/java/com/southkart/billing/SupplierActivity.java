@@ -11,16 +11,13 @@ import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 
-import com.southkart.billing.data.BillingContract;
-import com.southkart.billing.data.BillingContract.SupplierEntry;
+import com.southkart.billing.data.InventoryContract.SupplierEntry;
 
 public class SupplierActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -39,13 +36,13 @@ public class SupplierActivity extends AppCompatActivity implements LoaderManager
         ListView list = (ListView) findViewById(R.id.supplierList);
 
         // Create object of Custom Cursor Adapter
-        mCursorAdapter = new SupplierCursorAdapter(this,null);
+        mCursorAdapter = new SupplierCursorAdapter(this, null);
 
         // Hook up the Adapter and the List View
         list.setAdapter(mCursorAdapter);
 
         // Kick Off the Loader
-        getLoaderManager().initLoader(SUPPLIER_LOADER,null,this);
+        getLoaderManager().initLoader(SUPPLIER_LOADER, null, this);
 
         // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
         View emptyView = findViewById(R.id.empty_view);
@@ -55,9 +52,9 @@ public class SupplierActivity extends AppCompatActivity implements LoaderManager
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(SupplierActivity.this,SupplierEditorActivity.class);
-                Uri currentPetUri = ContentUris.withAppendedId(SupplierEntry.CONTENT_URI,id);
-                intent.setData(currentPetUri);
+                Intent intent = new Intent(SupplierActivity.this, SupplierEditorActivity.class);
+                Uri currentSupplierUri = ContentUris.withAppendedId(SupplierEntry.CONTENT_URI, id);
+                intent.setData(currentSupplierUri);
                 startActivity(intent);
             }
         });
@@ -67,7 +64,7 @@ public class SupplierActivity extends AppCompatActivity implements LoaderManager
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent openAddNewSupplierView = new Intent(SupplierActivity.this,SupplierEditorActivity.class);
+                Intent openAddNewSupplierView = new Intent(SupplierActivity.this, SupplierEditorActivity.class);
                 startActivity(openAddNewSupplierView);
             }
         });
@@ -75,7 +72,7 @@ public class SupplierActivity extends AppCompatActivity implements LoaderManager
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_suppliers,menu);
+        getMenuInflater().inflate(R.menu.menu_suppliers, menu);
         return true;
     }
 
@@ -97,16 +94,16 @@ public class SupplierActivity extends AppCompatActivity implements LoaderManager
     }
 
     // Insert Dummy Function
-    private void insertDummy(){
+    private void insertDummy() {
         ContentValues values = new ContentValues();
-        values.put(SupplierEntry.SUPPLIER_NAME,"Rajan");
-        values.put(SupplierEntry.PHONE_NUMBER,"4444444444");
+        values.put(SupplierEntry.SUPPLIER_NAME, "Rajan");
+        values.put(SupplierEntry.PHONE_NUMBER, "4444444444");
 
-        Uri newUri = getContentResolver().insert(SupplierEntry.CONTENT_URI,values);
+        Uri newUri = getContentResolver().insert(SupplierEntry.CONTENT_URI, values);
     }
 
-    private void deleteAllSuppliers(){
-        getContentResolver().delete(SupplierEntry.CONTENT_URI,null,null);
+    private void deleteAllSuppliers() {
+        getContentResolver().delete(SupplierEntry.CONTENT_URI, null, null);
     }
 
     // Loader Method Implementation

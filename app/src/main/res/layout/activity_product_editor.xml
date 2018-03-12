@@ -8,15 +8,16 @@
     tools:context=".ProductEditorActivity">
 
     <RelativeLayout
-        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary">
+
         <ImageView
             android:id="@+id/productImage"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_image_plus"/>
+            android:src="@drawable/ic_image_plus" />
     </RelativeLayout>
 
     <LinearLayout
@@ -54,8 +55,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="40dp">
+        android:layout_marginTop="40dp"
+        android:orientation="horizontal">
 
         <TextView
             android:layout_width="0dp"
@@ -74,26 +75,27 @@
             android:paddingLeft="8dp">
 
             <Button
-                android:id="@+id/subtractOne"
+                android:id="@+id/button_subtract_one"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Minus"/>
+                android:layout_weight="1"
+                android:text="Minus" />
 
             <EditText
                 android:id="@+id/quantity"
                 android:layout_width="0dp"
-                android:layout_weight="1"
-                android:inputType="numberDecimal"
                 android:layout_height="wrap_content"
-                android:hint="0" />
+                android:layout_weight="1"
+                android:hint="0"
+                android:inputType="numberDecimal"
+                android:maxLength="5" />
 
             <Button
-                android:id="@+id/addOne"
+                android:id="@+id/button_add_one"
                 android:layout_width="0dp"
-                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Add"/>
+                android:layout_weight="1"
+                android:text="Add" />
 
         </LinearLayout>
 
@@ -122,12 +124,26 @@
 
             <EditText
                 android:id="@+id/price"
-                android:inputType="numberDecimal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="0" />
+                android:hint="0"
+                android:inputType="numberDecimal"
+                android:maxLength="5" />
 
         </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/order"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="ORDER" />
 
     </LinearLayout>
 

@@ -40,7 +40,7 @@
         </activity>
 
         <provider
-            android:name=".data.BillingProvider"
+            android:name=".data.InventoryProvider"
             android:authorities="com.southkart.billing"
             android:exported="false" />
 
