@@ -12,12 +12,11 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,7 +24,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.southkart.billing.data.DbBitmapUtility;
 import com.southkart.billing.data.InventoryContract.ProductEntry;
 
 import java.io.ByteArrayOutputStream;
@@ -79,9 +77,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
+        // Instead of showing a blank list view show some sample content
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if(!prefs.getBoolean("firstTime", false)) {
-            insertDummy();
+            insertBanana();
+            insertOrange();
             SharedPreferences.Editor editor = prefs.edit();
             editor.putBoolean("firstTime", true);
             editor.commit();
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     // Insert Dummy Function
-    private void insertDummy() {
+    private void insertBanana() {
         Bitmap placeholder = BitmapFactory.decodeResource(getResources(),
                 R.drawable.banana);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -124,6 +124,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         values.put(ProductEntry.PRODUCT_NAME, "Banana");
         values.put(ProductEntry.PRODUCT_QUANTITY, 5);
         values.put(ProductEntry.PRODUCT_PRICE, 10);
+        values.put(ProductEntry.PRODUCT_IMAGE, img);
+
+        Uri newUri = getContentResolver().insert(ProductEntry.CONTENT_URI, values);
+    }
+
+    // Insert Dummy Function
+    private void insertOrange() {
+        Bitmap placeholder = BitmapFactory.decodeResource(getResources(),
+                R.drawable.orange);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        placeholder.compress(Bitmap.CompressFormat.JPEG, 0, stream);
+        byte[] img = stream.toByteArray();
+
+        ContentValues values = new ContentValues();
+        values.put(ProductEntry.PRODUCT_NAME, "Orange");
+        values.put(ProductEntry.PRODUCT_QUANTITY, 10);
+        values.put(ProductEntry.PRODUCT_PRICE, 5);
         values.put(ProductEntry.PRODUCT_IMAGE, img);
 
         Uri newUri = getContentResolver().insert(ProductEntry.CONTENT_URI, values);

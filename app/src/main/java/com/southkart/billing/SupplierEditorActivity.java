@@ -35,7 +35,6 @@ public class SupplierEditorActivity extends AppCompatActivity implements LoaderM
         mSupplierName = (EditText) findViewById(R.id.supplierName);
         mSupplierPhone = (EditText) findViewById(R.id.supplierPhone);
 
-
         Intent intent = getIntent();
         mCurrentSupplierUri = intent.getData();
         if (mCurrentSupplierUri == null) {

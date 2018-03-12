@@ -37,11 +37,11 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
     private EditText mProductQuantity;
     private EditText mProductPrice;
     private ImageView mProductImage;
+    private Button orderBtn;
 
     private Button addOne;
     private Button subtractOne;
 
-    private Button orderBtn;
     private boolean mProductHasChanged = false;
     private boolean mImageHasChanged = false;
 
@@ -66,6 +66,7 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
 
         addOne = (Button) findViewById(R.id.button_add_one);
         subtractOne = (Button) findViewById(R.id.button_subtract_one);
+        orderBtn = (Button) findViewById(R.id.order);
 
         // Set the OnTouch Listener
         mProductName.setOnTouchListener(mTouchListener);
@@ -81,6 +82,7 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
             // Hide the Increment and Decrement Button
             addOne.setVisibility(View.GONE);
             subtractOne.setVisibility(View.GONE);
+            orderBtn.setVisibility(View.GONE);
         } else {
             setTitle("Edit Product");
             getLoaderManager().initLoader(EXISTING_PRODUCT_LOADER, null, this);
@@ -88,6 +90,7 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
             // Show the Increment and Decrement Button
             addOne.setVisibility(View.VISIBLE);
             subtractOne.setVisibility(View.VISIBLE);
+            orderBtn.setVisibility(View.VISIBLE);
         }
 
         addOne.setOnClickListener(new View.OnClickListener() {
@@ -103,19 +106,18 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
             }
         });
 
-        Button orderBtn = (Button) findViewById(R.id.order);
+
         orderBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Intent Setup
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                //sendIntent.putExtra(Intent.EXTRA_TEXT, message);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, orderBtn.getTag().toString());
                 sendIntent.setType("text/plain");
                 if (sendIntent.resolveActivity(getPackageManager()) != null) {
                     startActivity(sendIntent);
                 }
-                startActivity(sendIntent);
             }
         });
 
@@ -376,6 +378,7 @@ public class ProductEditorActivity extends AppCompatActivity implements LoaderMa
             mProductName.setText(productName);
             mProductQuantity.setText(quantity);
             mProductPrice.setText(price);
+            orderBtn.setTag(productName);
             if (imageInBytes != null) {
                 mProductImage.setImageBitmap(DbBitmapUtility.getImage(imageInBytes));
             }

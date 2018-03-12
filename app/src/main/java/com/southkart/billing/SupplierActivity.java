@@ -96,8 +96,8 @@ public class SupplierActivity extends AppCompatActivity implements LoaderManager
     // Insert Dummy Function
     private void insertDummy() {
         ContentValues values = new ContentValues();
-        values.put(SupplierEntry.SUPPLIER_NAME, "Rajan");
-        values.put(SupplierEntry.PHONE_NUMBER, "4444444444");
+        values.put(SupplierEntry.SUPPLIER_NAME, getString(R.string.sample_supplier));
+        values.put(SupplierEntry.PHONE_NUMBER, getString(R.string.sample_phone));
 
         Uri newUri = getContentResolver().insert(SupplierEntry.CONTENT_URI, values);
     }

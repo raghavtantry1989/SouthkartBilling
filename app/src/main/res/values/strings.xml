@@ -13,4 +13,6 @@
     <string name="keep_editing">Keep Editing</string>
     <string name="discard">Discard</string>
     <string name="discard_and_quit">Discard Changes and Quit Editing?</string>
+    <string name="sample_supplier">Rajan</string>
+    <string name="sample_phone">4444444444</string>
 </resources>
